@@ -1,7 +1,7 @@
 import React from 'react'
 
-export default function Footer() {
+export default function Footer({ version = '0.0.0'}) {
   return (
-    <div>Footer</div>
+    <div>Version : {version}</div>
   )
 }
