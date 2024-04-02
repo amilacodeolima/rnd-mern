@@ -40,9 +40,7 @@ router.get('/:id', function(req, res, next) {
 router.post('/', function(req, res, next) {
     
     try{
-        const body = req.body;
-        const name = body.name;
-        const price = body.price;
+        const { name, price } = req.body;
         if(name && price){
             const newProduct = { name: body.name, price : body.price }
             // Start : Should replace by Actual DB Query
