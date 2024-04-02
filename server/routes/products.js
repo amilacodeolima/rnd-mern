@@ -2,17 +2,16 @@ var express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const { DUMMY_PRODUCT_LIST } = require('../dummy/dummy-products');
 var router = express.Router();
+var Products = require('../models/products')
 
 // List Products 
-router.get('/', function(req, res, next) {
+router.get('/', async (req, res, next) => {
   
     try{
-        // Start : Should replace by Actual DB Query 
-        const products = DUMMY_PRODUCT_LIST
-        // End
-        return res.status(200).json(products)
+        const productList = await Products.find({}).exec()
+        return res.status(200).json(productList)
     }catch(e){
-        res.status(500).json()
+                res.status(500).json()
     }
 
 });
