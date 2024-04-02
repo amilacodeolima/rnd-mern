@@ -11,19 +11,17 @@ router.get('/', async (req, res, next) => {
         const productList = await Products.find({}).exec()
         return res.status(200).json(productList)
     }catch(e){
-                res.status(500).json()
+        res.status(500).json()
     }
 
 });
 
 // Product Get By Id 
-router.get('/:id', function(req, res, next) {
+router.get('/:id', async (req, res, next) => {
     
     try{
-        const id = req.params.id;
-        // Start : Should replace by Actual DB Query
-        const product = DUMMY_PRODUCT_LIST.find((item) => item._id === id)
-        // End
+        const _id = req.params.id;
+        const product = await Products.findOne({_id : _id }).exec()        
         if(product){
             return res.status(200).json(product)
         }else{
@@ -36,19 +34,15 @@ router.get('/:id', function(req, res, next) {
 });
 
 // Create Product
-router.post('/', function(req, res, next) {
+router.post('/', async (req, res, next) => {
     
     try{
         const { name, price } = req.body;
         if(name && price){
-            const newProduct = { name: body.name, price : body.price }
-            // Start : Should replace by Actual DB Query
-            const finalobj = { _id : uuidv4(), ...newProduct}
-            DUMMY_PRODUCT_LIST.push(finalobj)
-            const product =  finalobj;
-            // End
+            const newProduct = new Products({ name, price })
+            await newProduct.save()
             // TODO : if product already exsist in db should return 409 
-            return res.status(200).json(product)
+            return res.status(200).json(newProduct)
         }else{
             return res.status(400).json()
         }
