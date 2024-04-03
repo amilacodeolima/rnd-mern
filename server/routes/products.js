@@ -5,6 +5,7 @@ var Products = require('../models/products')
 // List Products 
 router.get('/', async (req, res, next) => {
   
+    // TODO : Pagination, page = 1, limit = 10 ( default values )
     try{
         const productList = await Products.find({}).exec()
         return res.status(200).json(productList)
