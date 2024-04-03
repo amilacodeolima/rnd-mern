@@ -36,9 +36,14 @@ router.get('/:id', async (req, res, next) => {
 // Create Product
 router.post('/', async (req, res, next) => {
     
+    // req.params eg : /products/:id = /products/1234 ->    id = req.params.id     =>  id = 1234
+    // req.query  eg : /products?page=1 ->                  page = req.query.page  => page = 1
+    // req.body   eg : { name : 'abc'} ->                   name = req.body.name   => name = "abc"
+
     try{
         const { name, price } = req.body;
-        if(name && price){
+        // TODO : Use lib for paylod validation
+        if(name && price && !isNaN(price)){
             const newProduct = new Products({ name, price })
             await newProduct.save()
             // TODO : if product already exsist in db should return 409 
@@ -47,26 +52,47 @@ router.post('/', async (req, res, next) => {
             return res.status(400).json()
         }
     }catch(err){
-        return res.status(500).json(err)
+        return res.status(500).json()
     }
 
 });
 
 // Product Update by Id 
+router.put('/:id', async (req, res, next) => {
+    
+    // req.params eg : /products/:id = /products/1234 ->    id = req.params.id     =>  id = 1234
+    // req.query  eg : /products?page=1 ->                  page = req.query.page  => page = 1
+    // req.body   eg : { name : 'abc'} ->                   name = req.body.name   => name = "abc"
+
+    try{
+        const id = req.params.id
+        const { name, price } = req.body;
+        if(name && price && !isNaN(price)){
+            const product = await Products.findOne({_id : id }).exec() 
+            if(product){
+                const updateProduct = await Products.findOneAndUpdate({ _id: id }, { name, price }, { new: true } )
+                // TODO : if product already exsist in db should return 409 
+                return res.status(200).json(updateProduct)
+            }else{
+                return res.status(404).json()
+            }
+        }else{
+            return res.status(400).json()
+        }
+    }catch(err){
+        return res.status(500).json()
+    }
+
+});
 
 // Delete Product by Id
-router.delete('/:id', function(req, res, next) {
+router.delete('/:id', async (req, res, next) => {
     
     try{
         const id = req.params.id;
-        // Start : Should replace by Actual DB Query 
-        const product = DUMMY_PRODUCT_LIST.find((item) => item._id === id)
-        // End 
+        const product = await Products.findOne({_id : _id }).exec() 
         if(product){
-            // Start : Should replace by Actual DB Query 
-            const index = DUMMY_PRODUCT_LIST.findIndex((item) => item._id === product._id)
-            DUMMY_PRODUCT_LIST.splice(index, 1)
-            // End 
+            await Products.deleteOne({ _id : product._id })
             return res.status(200).json()
         }else{
             return res.status(404).json()
