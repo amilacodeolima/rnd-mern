@@ -1,6 +1,4 @@
 var express = require('express');
-const { v4: uuidv4 } = require('uuid');
-const { DUMMY_PRODUCT_LIST } = require('../dummy/dummy-products');
 var router = express.Router();
 var Products = require('../models/products')
 
