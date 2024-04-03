@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import Product from './Product';
+import Loading from './Loading';
 
 export default class RndClsCom extends Component {
 
@@ -35,7 +36,7 @@ export default class RndClsCom extends Component {
     return (
       <>        
         {this.state.isLoading ? 
-            <div>Loading ....</div> : 
+            <Loading /> : 
             <div>{this.state.products.map((item) => <Product key={item._id} name={item.name} price={item.price} /> )}</div>
         }        
       </>
