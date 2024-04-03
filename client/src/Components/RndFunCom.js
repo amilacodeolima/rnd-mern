@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Product from './Product';
 import Loading from './Loading';
+import { fetchProducts } from '../Services/apiService';
 
 const RndFunCom =  () => {
 
@@ -10,7 +11,7 @@ const RndFunCom =  () => {
 
     useEffect(() => {
 
-        axios.get( `${process.env.REACT_APP_API_URL}/products`)
+        fetchProducts()
           .then((response) => {
             setProducts(response.data)
           })
