@@ -28,7 +28,18 @@ const validateRequestPayload = (reqPayload = {}, validationConfig = []) => {
                 message: `required type is ${type}`
             })
         }
-        if(isKeyFound && type !== "string" && type !== typeof isKeyFound){
+        // TODO : Validate 0 and - values 
+        if(isKeyFound && type === "number"){
+            // Continue
+            const keyAsNumber = parseFloat(isKeyFound);
+            if(isNaN(keyAsNumber)){
+                isError.push({
+                    key, 
+                    error: `${key} is Invlaid Type`,
+                    message: `required type is ${type}`
+                })
+            }
+        }else if(isKeyFound && type !== "string" && type !== typeof isKeyFound){
             isError.push({
                 key, 
                 error: `${key} is Invlaid Type`,
