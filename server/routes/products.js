@@ -6,12 +6,12 @@ var Products = require('../models/products')
 router.get('/', async (req, res, next) => {
   
     // TODO : Pagination, page = 1, limit = 10 ( default values )
-    try{
+        try{
         const productList = await Products.find({}).exec()
-        return res.status(200).json(productList)
-    }catch(e){
-        res.status(500).json()
-    }
+            return res.status(200).json(productList)
+        }catch(e){
+            res.status(500).json()
+        }
 
 });
 
@@ -32,6 +32,38 @@ router.get('/:id', async (req, res, next) => {
 
 });
 
+// Com Method
+/**
+ * 
+ * @param {*} reqPayload 
+ * @param {*} validationConfig 
+ * @returns Array
+ */
+const validateRequestPayload = (reqPayload = {}, validationConfig = []) => {
+
+    const isError = [];
+    // const name = reqPayload.name
+    // const price = reqPayload.price 
+    // if(!name) {
+    //     isError = isError + `Name is Required`
+    // }
+    // if(!price){
+    //     isError = isError + `Price is Required`
+    // }
+    const vConfigLength =  validationConfig.length;
+    for(let i  = 0; i < vConfigLength; i++){
+        const key = validationConfig[i]
+        const isKeyFound = reqPayload[key];
+        if(!isKeyFound){
+            isError.push({
+                key, 
+                error: `${key} is Required`
+            })
+        }
+    }
+    return isError;
+}
+
 // Create Product
 router.post('/', async (req, res, next) => {
     
@@ -42,13 +74,15 @@ router.post('/', async (req, res, next) => {
     try{
         const { name, price } = req.body;
         // TODO : Use lib for paylod validation
-        if(name && price && !isNaN(price)){
+        const validationConfig = ["name", "price"];
+        const isError = validateRequestPayload(req.body, validationConfig)
+        if(!isError.length){
             const newProduct = new Products({ name, price })
             await newProduct.save()
             // TODO : if product already exsist in db should return 409 
             return res.status(200).json(newProduct)
         }else{
-            return res.status(400).json()
+            return res.status(400).json(isError)
         }
     }catch(err){
         return res.status(500).json()
