@@ -1,16 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var Products = require('../models/products')
+var { validateRequestPayload } = require('../util/validateRequestPayload')
 
 // List Products 
 router.get('/', async (req, res, next) => {
   
-    try{
+    // TODO : Pagination, page = 1, limit = 10 ( default values )
+        try{
         const productList = await Products.find({}).exec()
-        return res.status(200).json(productList)
-    }catch(e){
-        res.status(500).json()
-    }
+            return res.status(200).json(productList)
+        }catch(e){
+            res.status(500).json()
+        }
 
 });
 
@@ -32,6 +34,11 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // Create Product
+const validationConfigCreateObj = [
+   { key: "name", type: "string", isRequired: true },
+   { key: "price", type: "number", isRequired: true },
+   { key: "desc", type: "string", isRequired: false }
+];
 router.post('/', async (req, res, next) => {
     
     // req.params eg : /products/:id = /products/1234 ->    id = req.params.id     =>  id = 1234
@@ -39,15 +46,16 @@ router.post('/', async (req, res, next) => {
     // req.body   eg : { name : 'abc'} ->                   name = req.body.name   => name = "abc"
 
     try{
-        const { name, price } = req.body;
+    
         // TODO : Use lib for paylod validation
-        if(name && price && !isNaN(price)){
-            const newProduct = new Products({ name, price })
+        const isError = validateRequestPayload(req.body, validationConfigCreateObj)
+        if(!isError.length){
+            const newProduct = new Products(req.body)
             await newProduct.save()
             // TODO : if product already exsist in db should return 409 
             return res.status(200).json(newProduct)
         }else{
-            return res.status(400).json()
+            return res.status(400).json(isError)
         }
     }catch(err){
         return res.status(500).json()
@@ -56,6 +64,11 @@ router.post('/', async (req, res, next) => {
 });
 
 // Product Update by Id 
+const validationConfigUpdateObj = [
+    { key: "name", type: "string", isRequired: false },
+    { key: "price", type: "number", isRequired: false },
+    { key: "desc", type: "string", isRequired: false }
+ ];
 router.put('/:id', async (req, res, next) => {
     
     // req.params eg : /products/:id = /products/1234 ->    id = req.params.id     =>  id = 1234
@@ -64,18 +77,18 @@ router.put('/:id', async (req, res, next) => {
 
     try{
         const id = req.params.id
-        const { name, price } = req.body;
-        if(name && price && !isNaN(price)){
+        const isError = validateRequestPayload(req.body, validationConfigUpdateObj)
+        if(!isError.length){
             const product = await Products.findOne({_id : id }).exec() 
-            if(product){
-                const updateProduct = await Products.findOneAndUpdate({ _id: id }, { name, price }, { new: true } )
+            if(product){                
+                const updateProduct = await Products.findOneAndUpdate({ _id: id }, req.body, { new: true } )
                 // TODO : if product already exsist in db should return 409 
                 return res.status(200).json(updateProduct)
             }else{
                 return res.status(404).json()
             }
         }else{
-            return res.status(400).json()
+            return res.status(400).json(isError)
         }
     }catch(err){
         return res.status(500).json()
@@ -88,7 +101,7 @@ router.delete('/:id', async (req, res, next) => {
     
     try{
         const id = req.params.id;
-        const product = await Products.findOne({_id : _id }).exec() 
+        const product = await Products.findOne({_id : id }).exec() 
         if(product){
             await Products.deleteOne({ _id : product._id })
             return res.status(200).json()
