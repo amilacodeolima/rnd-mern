@@ -36,7 +36,8 @@ router.get('/:id', async (req, res, next) => {
 // Create Product
 const validationConfigCreateObj = [
    { key: "name", type: "string", isRequired: true },
-   { key: "price", type: "number", isRequired: true }
+   { key: "price", type: "number", isRequired: true },
+   { key: "desc", type: "string", isRequired: false }
 ];
 router.post('/', async (req, res, next) => {
     
@@ -65,7 +66,8 @@ router.post('/', async (req, res, next) => {
 // Product Update by Id 
 const validationConfigUpdateObj = [
     { key: "name", type: "string", isRequired: false },
-    { key: "price", type: "number", isRequired: false }
+    { key: "price", type: "number", isRequired: false },
+    { key: "desc", type: "string", isRequired: false }
  ];
 router.put('/:id', async (req, res, next) => {
     
