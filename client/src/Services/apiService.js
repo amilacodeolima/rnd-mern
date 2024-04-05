@@ -9,4 +9,5 @@ const apiClient = axios.create({
 // TODO : Add Pagination
 export const fetchProducts = () => apiClient.get('/products');
 export const fetchProductById = (id) => apiClient.get(`/products/${id}`);
+export const createProducts = (payload) => apiClient.post(`/products`, payload)
 // TODO : Product -> Create, Update, Delete
